@@ -47,25 +47,50 @@ app.get('/ola/:nome', (req, res) => {
     res.send(`<h1>BEM VINDO, ${req.params.nome} HAHAHAHAHA</h1>`);
 });
 
-const estoque = [];
+let estoque = [];
 
 app.get('/adicionar/:id/:nome/:qtd', (req, res) => {
     let id = req.params.id;
     let nome = req.params.nome;
     let qtd = req.params.qtd;
-    let resultado_estoque = `<h2>Id: ${id}</h2>\n<h2>Nome: ${nome}</h2>\n<h2>Quantidade: ${qtd}</h2>`;
-    estoque.push(resultado_estoque);
-    res.send("Cadastrado com sucesso!");
+    let novoProduto = {
+        id: id,
+        nome: nome,
+        qtd: Number(qtd)
+    };
+    estoque.push(novoProduto);
+    res.send("<h1>Cadastrado com sucesso!</h1>");
 });
 
 app.get('/listar', (req, res) => {
-    resultado = ""
-    estoque.forEach(log => {
-        resultado += log;
+    let listagem = "<h1>Estoque atual:</h1>";
+
+    estoque.forEach(produto => {
+        listagem += `<hr>
+                    <h2>Id: ${produto.id}</h2>
+                    <h2>Nome: ${produto.nome}</h2>
+                    <h2>Quantidade: ${produto.qtd}</h2>`;
     });
-    res.send(resultado);
+
+    res.send(listagem || "Estoque vazio.");
 });
 
 app.get('/remover/:id', (req, res) => {
-    
+    let idRemover = req.params.id;
+
+    estoque = estoque.filter(produto => produto.id !== idRemover);
+
+    res.send(`Produto ${idRemover} removido com sucesso!`)
+});
+
+app.get('/editar/:id/:qtd', (req, res) => {
+    let { id, qtd } = req.params;
+    let produto = estoque.find(p => p.id === id);
+
+    if (produto) {
+        produto.qtd = Number(qtd);
+        res.send(`<h1>Quantidade atualizada para: ${qtd}`);
+    } else {
+        res.send("<h1>Produto não encontrado!</h1>");
+    }
 });
